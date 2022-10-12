@@ -1,0 +1,19 @@
+cutadaptMinLength: 50
+cutadaptErrorRate: 0.2
+vsearchMinQual: 10
+vsearchMaxee: 0.5
+vsearchMinovlen: 69
+fitnessMinInputCountAny: 0
+fitnessMinInputCountAll: 2000
+fitnessMinOutputCountAny: 0
+fitnessMinOutputCountAll: 200
+sequenceType: "noncoding"
+retainedReplicates: "1,2,3,4,5"
+transLibrary: "FALSE"
+transLibraryReverseComplement: "FALSE"
+maxSubstitutions: 69
+cutadaptCommand: "--cutadapt5First TTCAACCAAGTTGG --cutadapt5Second AAAAAAAATAATCAACG"
+extraCommandsWrap: "--experimentDesignPairDuplicates TRUE"
+extraCommandsSteam: "--experimentDesignPairDuplicates TRUE"
+wildTypeSequence: "TTCCGTTGGCGTAATGGTAACGCGTCTCCCTCCTAAGGAGAAGACTGCGGGTTCGAGTCCCGTACGGAA"
+

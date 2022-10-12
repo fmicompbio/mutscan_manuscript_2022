@@ -1,0 +1,20 @@
+adapterForward: ""
+adapterReverse: ""
+elementsForward: "SPVCS"
+elementLengthsForward: [-1,14,69,10,-1]
+elementsReverse: "SPVCS"
+elementLengthsReverse: [-1,17,69,9,-1]
+primerForward: "TTCAACCAAGTTGG"
+primerReverse: "AAAAAAAATAATCAACG"
+# ## wildTypeForward/Reverse should be named vectors
+wildTypeForward: 
+  f: "TTCCGTTGGCGTAATGGTAACGCGTCTCCCTCCTAAGGAGAAGACTGCGGGTTCGAGTCCCGTACGGAA"
+wildTypeReverse: 
+  r: ""
+constantForward: "CGTTGATTAT"
+constantReverse: "CCAAGTTGG"
+
+fastqFileExtension: ".fastq"
+gzipped: "TRUE"
+stranded: "TRUE"
+paired: "TRUE"

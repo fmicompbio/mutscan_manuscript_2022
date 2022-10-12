@@ -1,0 +1,53 @@
+mergeForwardReverse: TRUE
+minOverlap: 0
+maxOverlap: 0
+minMergedLength: 0
+maxMergedLength: 0
+maxFracMismatchOverlap: 1
+greedyOverlap: TRUE
+revComplForward: FALSE
+revComplReverse: TRUE
+avePhredMinForward: 20
+avePhredMinReverse: 20
+variableNMaxForward: 0
+variableNMaxReverse: 0
+umiNMax: 0
+nbrMutatedCodonsMaxForward: -1
+nbrMutatedCodonsMaxReverse: -1
+nbrMutatedBasesMaxForward: 2
+nbrMutatedBasesMaxReverse: 0
+forbiddenMutatedCodonsForward: ""
+forbiddenMutatedCodonsReverse: ""
+useTreeWTmatch: FALSE
+mutatedPhredMinForward: 20
+mutatedPhredMinReverse: 20
+mutNameDelimiter: "."
+constantMaxDistForward: -1
+constantMaxDistReverse: -1
+variableCollapseMaxDist: 0
+variableCollapseMinReads: 0
+variableCollapseMinRatio: 0
+umiCollapseMaxDist: 0
+filteredReadsFastqForward: ""
+filteredReadsFastqReverse: ""
+verbose: FALSE
+chunkSize: 100000
+
+countType: "reads"
+
+minInputCountAny: 0
+minInputCountAll: 0
+minOutputCountAny: 0
+minOutputCountAll: 0
+
+collapseToAA: FALSE
+
+replicateCol: "experiment"
+conditionCol: "selection_id"
+numerator: "1"
+denominator: "0"
+odCol: "OD"
+wtrows: 
+  - "f.0.NA"
+  - "f.0.WT"
+normMethod: "sum"

@@ -1,0 +1,224 @@
+{
+  "conditions": [
+    {
+      "name": "all", 
+      "selections": [
+        {
+          "libraries": [
+            { 
+              "fastq": {
+                "filters": {
+                  "avg quality": 20,
+                  "max N": 0
+                }, 
+                "length": 125, 
+                "forward reads": "Diss_FOS/FASTQ/SRR5952435_1.fastq.gz", 
+                "reverse reads": "Diss_FOS/FASTQ/SRR5952435_2.fastq.gz", 
+                "reverse": 0
+              }, 
+              "overlap": {
+                "forward start": 30,
+                "reverse start": 26,
+                "length": 96,
+                "trim": true,
+                "max mismatches": 96,
+                "overlap only": true
+              },
+              "name": "CISIN1", 
+              "report filtered reads": true, 
+              "timepoint": 0, 
+              "variants": {
+                "max mutations": 2,
+                "min count": 0, 
+                "use aligner": false, 
+                "wild type": {
+                  "coding": true, 
+                  "reference offset": 0, 
+                  "sequence": "ACTGATACACTCCAAGCGGAGACAGACCAACTAGAAGATGAGAAGTCTGCTTTGCAGACCGAGATTGCCAACCTGCTGAAGGAGAAGGAAAAACTA"
+                }
+              }
+            }, 
+            {
+              "fastq": {
+                "filters": {
+                  "avg quality": 20,
+                  "max N": 0
+                }, 
+                "length": 125, 
+                "forward reads": "Diss_FOS/FASTQ/SRR5952438_1.fastq.gz", 
+                "reverse reads": "Diss_FOS/FASTQ/SRR5952438_2.fastq.gz", 
+                "reverse": 0
+              }, 
+              "overlap": {
+                "forward start": 30,
+                "reverse start": 26,
+                "length": 96,
+                "trim": true,
+                "max mismatches": 96,
+                "overlap only": true
+              },
+              "name": "CISOU1", 
+              "report filtered reads": true, 
+              "timepoint": 1, 
+              "variants": {
+                "max mutations": 2,
+                "min count": 0, 
+                "use aligner": false, 
+                "wild type": {
+                  "coding": true, 
+                  "reference offset": 0, 
+                  "sequence": "ACTGATACACTCCAAGCGGAGACAGACCAACTAGAAGATGAGAAGTCTGCTTTGCAGACCGAGATTGCCAACCTGCTGAAGGAGAAGGAAAAACTA"
+                }
+              }
+            }
+          ], 
+          "name": "CIS1"
+        }, 
+        {
+            "libraries": [
+              {
+                "fastq": {
+                  "filters": {
+                    "avg quality": 20,
+                    "max N": 0
+                  }, 
+                  "length": 125, 
+                  "forward reads": "Diss_FOS/FASTQ/SRR5952436_1.fastq.gz", 
+                  "reverse reads": "Diss_FOS/FASTQ/SRR5952436_2.fastq.gz", 
+                  "reverse": 0
+                }, 
+                "overlap": {
+                  "forward start": 30,
+                  "reverse start": 26,
+                  "length": 96,
+                  "trim": true,
+                  "max mismatches": 96,
+                  "overlap only": true
+                },
+                "name": "CISIN2", 
+                "report filtered reads": true, 
+                "timepoint": 0, 
+                "variants": {
+                  "max mutations": 2,
+                  "min count": 0, 
+                  "use aligner": false, 
+                  "wild type": {
+                    "coding": true, 
+                    "reference offset": 0, 
+                    "sequence": "ACTGATACACTCCAAGCGGAGACAGACCAACTAGAAGATGAGAAGTCTGCTTTGCAGACCGAGATTGCCAACCTGCTGAAGGAGAAGGAAAAACTA"
+                  }
+                }
+              }, 
+              {
+                "fastq": {
+                  "filters": {
+                    "avg quality": 20,
+                    "max N": 0
+                  }, 
+                  "length": 125, 
+                  "forward reads": "Diss_FOS/FASTQ/SRR5952439_1.fastq.gz", 
+                  "reverse reads": "Diss_FOS/FASTQ/SRR5952439_2.fastq.gz", 
+                  "reverse": 0
+                }, 
+                "overlap": {
+                  "forward start": 30,
+                  "reverse start": 26,
+                  "length": 96,
+                  "trim": true,
+                  "max mismatches": 96,
+                  "overlap only": true
+                },
+                "name": "CISOU2", 
+                "report filtered reads": true, 
+                "timepoint": 1, 
+                "variants": {
+                  "max mutations": 2,
+                  "min count": 0, 
+                  "use aligner": false, 
+                  "wild type": {
+                    "coding": true, 
+                    "reference offset": 0, 
+                    "sequence": "ACTGATACACTCCAAGCGGAGACAGACCAACTAGAAGATGAGAAGTCTGCTTTGCAGACCGAGATTGCCAACCTGCTGAAGGAGAAGGAAAAACTA"
+                  }
+                }
+              }
+            ], 
+            "name": "CIS2"
+          }, 
+          {
+            "libraries": [
+              {
+                "fastq": {
+                  "filters": {
+                    "avg quality": 20,
+                    "max N": 0
+                  }, 
+                  "length": 125, 
+                  "forward reads": "Diss_FOS/FASTQ/SRR5952437_1.fastq.gz", 
+                  "reverse reads": "Diss_FOS/FASTQ/SRR5952437_2.fastq.gz", 
+                  "reverse": 0
+                }, 
+                "overlap": {
+                  "forward start": 30,
+                  "reverse start": 26,
+                  "length": 96,
+                  "trim": true,
+                  "max mismatches": 96,
+                  "overlap only": true
+                },
+                "name": "CISIN3", 
+                "report filtered reads": true, 
+                "timepoint": 0, 
+                "variants": {
+                  "max mutations": 2,
+                  "min count": 0, 
+                  "use aligner": false, 
+                  "wild type": {
+                    "coding": true, 
+                    "reference offset": 0, 
+                    "sequence": "ACTGATACACTCCAAGCGGAGACAGACCAACTAGAAGATGAGAAGTCTGCTTTGCAGACCGAGATTGCCAACCTGCTGAAGGAGAAGGAAAAACTA"
+                  }
+                }
+              }, 
+              {
+                "fastq": {
+                  "filters": {
+                    "avg quality": 20,
+                    "max N": 0
+                  }, 
+                  "length": 125, 
+                  "forward reads": "Diss_FOS/FASTQ/SRR5952440_1.fastq.gz", 
+                  "reverse reads": "Diss_FOS/FASTQ/SRR5952440_2.fastq.gz", 
+                  "reverse": 0
+                }, 
+                "overlap": {
+                  "forward start": 30,
+                  "reverse start": 26,
+                  "length": 96,
+                  "trim": true,
+                  "max mismatches": 96,
+                  "overlap only": true
+                },
+                "name": "CISOU3", 
+                "report filtered reads": true, 
+                "timepoint": 1, 
+                "variants": {
+                  "max mutations": 2,
+                  "min count": 0, 
+                  "use aligner": false, 
+                  "wild type": {
+                    "coding": true, 
+                    "reference offset": 0, 
+                    "sequence": "ACTGATACACTCCAAGCGGAGACAGACCAACTAGAAGATGAGAAGTCTGCTTTGCAGACCGAGATTGCCAACCTGCTGAAGGAGAAGGAAAAACTA"
+                  }
+                }
+              }
+            ], 
+            "name": "CIS3"
+          }
+      ]
+    }
+  ], 
+  "name": "Diss_FOS", 
+  "output directory": "Diss_FOS/output/enrich2/"
+}

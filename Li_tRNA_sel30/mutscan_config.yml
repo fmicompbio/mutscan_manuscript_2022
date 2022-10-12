@@ -1,0 +1,54 @@
+mergeForwardReverse: TRUE
+minOverlap: 69
+maxOverlap: 69
+minMergedLength: 0
+maxMergedLength: 0
+maxFracMismatchOverlap: 0
+greedyOverlap: TRUE
+revComplForward: FALSE
+revComplReverse: TRUE
+avePhredMinForward: 20
+avePhredMinReverse: 20
+variableNMaxForward: 0
+variableNMaxReverse: 0
+umiNMax: 0
+nbrMutatedCodonsMaxForward: -1
+nbrMutatedCodonsMaxReverse: -1
+nbrMutatedBasesMaxForward: 69
+nbrMutatedBasesMaxReverse: -1
+forbiddenMutatedCodonsForward: ""
+forbiddenMutatedCodonsReverse: ""
+useTreeWTmatch: FALSE
+mutatedPhredMinForward: 0
+mutatedPhredMinReverse: 0
+mutNameDelimiter: "."
+constantMaxDistForward: 0
+constantMaxDistReverse: 0
+variableCollapseMaxDist: 0
+variableCollapseMinReads: 0
+variableCollapseMinRatio: 0
+umiCollapseMaxDist: 0
+filteredReadsFastqForward: ""
+filteredReadsFastqReverse: ""
+verbose: FALSE
+chunkSize: 100000
+
+countType: "reads"
+
+minInputCountAny: 0
+minInputCountAll: 2000
+minOutputCountAny: 0
+minOutputCountAll: 200
+
+collapseToAA: FALSE
+
+replicateCol: "experiment"
+conditionCol: "selection_id"
+numerator: "1"
+denominator: "0"
+odCol: "OD"
+wtrows: 
+  - "f.0.NA"
+  - "f.0.WT"
+# fcMethod: "edgeR"
+normMethod: "sum"

@@ -1,0 +1,7 @@
+sample_name	experiment	selection_id	biological_replicate	technical_replicate	pair1	pair2	mutscan_name	OD
+TRANSIN1	1	0			SRR5952429_1.fastq.gz	SRR5952429_2.fastq.gz	TRANSIN1	0.0025
+TRANSIN2	2	0			SRR5952430_1.fastq.gz	SRR5952430_2.fastq.gz	TRANSIN2	0.0025
+TRANSIN3	3	0			SRR5952431_1.fastq.gz	SRR5952431_2.fastq.gz	TRANSIN3	0.0025
+TRANSOU1	1	1	1		SRR5952432_1.fastq.gz	SRR5952432_2.fastq.gz	TRANSOU1	4.1762
+TRANSOU2	2	1	1		SRR5952433_1.fastq.gz	SRR5952433_2.fastq.gz	TRANSOU2	3.984
+TRANSOU3	3	1	1		SRR5952434_1.fastq.gz	SRR5952434_2.fastq.gz	TRANSOU3	3.9015

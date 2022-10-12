@@ -1,0 +1,7 @@
+sample_name	experiment	selection_id	biological_replicate	technical_replicate	pair1	pair2	mutscan_name	OD
+CISIN1	1	0			SRR5952435_1.fastq.gz	SRR5952435_2.fastq.gz	CISIN1	0.005
+CISIN2	2	0			SRR5952436_1.fastq.gz	SRR5952436_2.fastq.gz	CISIN2	0.005
+CISIN3	3	0			SRR5952437_1.fastq.gz	SRR5952437_2.fastq.gz	CISIN3	0.005
+CISOU1	1	1	1		SRR5952438_1.fastq.gz	SRR5952438_2.fastq.gz	CISOU1	2.337875
+CISOU2	2	1	1		SRR5952439_1.fastq.gz	SRR5952439_2.fastq.gz	CISOU2	2.56785
+CISOU3	3	1	1		SRR5952440_1.fastq.gz	SRR5952440_2.fastq.gz	CISOU3	2.4585

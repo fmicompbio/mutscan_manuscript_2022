@@ -1,0 +1,10 @@
+sample_name	experiment	selection_id	biological_replicate	technical_replicate	pair1	pair2	mutscan_name
+bTDP1IN5	1	0			SRR8713496_1.fastq.gz	SRR8713496_2.fastq.gz	bTDP1IN5
+bTDP1OU5A	1	1	1		SRR8713500_1.fastq.gz	SRR8713500_2.fastq.gz	bTDP1OU5
+bTDP1OU5B	1	1	2		SRR8713501_1.fastq.gz	SRR8713501_2.fastq.gz	bTDP1OU5
+bTDP1IN7	2	0			SRR8713498_1.fastq.gz	SRR8713498_2.fastq.gz	bTDP1IN7
+bTDP1OU7A	2	1	1		SRR8713504_1.fastq.gz	SRR8713504_2.fastq.gz	bTDP1OU7
+bTDP1OU7B	2	1	2		SRR8713505_1.fastq.gz	SRR8713505_2.fastq.gz	bTDP1OU7
+bTDP1IN8	3	0			SRR8713499_1.fastq.gz	SRR8713499_2.fastq.gz	bTDP1IN8
+bTDP1OU8A	3	1	1		SRR8713506_1.fastq.gz	SRR8713506_2.fastq.gz	bTDP1OU8
+bTDP1OU8B	3	1	2		SRR8713507_1.fastq.gz	SRR8713507_2.fastq.gz	bTDP1OU8

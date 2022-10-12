@@ -1,0 +1,416 @@
+---
+title: "Additional file 1:Reprocessing FOS/JUN data from Diss & Lehner (2018)"
+author: "Charlotte Soneson, Alexandra M Bendel, Guillaume Diss, Michael B Stadler"
+output: 
+  bookdown::html_document2:
+    toc: true
+    toc_float: true
+    theme: cosmo
+    code_folding: show
+    code_download: true
+    keep_md: true
+references:
+- id: Diss2018
+  title: The genetic landscape of a physical interaction
+  author:
+  - family: Diss
+    given: Guillaume
+  - family: Lehner
+    given: Ben
+  container-title: eLife
+  volume: 7
+  page: e32472
+  type: article-journal
+  URL: https://doi.org/10.7554/eLife.32472
+  issued:
+    year: 2018
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev = c("png", "pdf"))
+```
+
+
+# Introduction
+
+In this document, we reproduce the FOS/JUN protein-protein interaction analysis from the paper by @Diss2018. 
+We assume that the FASTQ files have been downloaded from [GEO record GSE102901](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE102901) and are placed in a folder named `FASTQ`.
+We start by tabulating the sample annotations, including the name we will use for downstream analysis (`Name`), the SRA ID (`SRAid`, for matching to the FASTQ files), the optical density (`OD`), the replicate number and the condition (whether it is an input or an output sample). 
+The goal will be to determine the fitness of each combination of FOS/JUN variants, relative to the wildtype sequence.
+
+```{r metadata}
+fastqdir <- "FASTQ"
+list.files(fastqdir)
+(samples <- data.frame(
+    Name = c("TRANSIN1", "TRANSIN2", "TRANSIN3", "TRANSOU1", "TRANSOU2", "TRANSOU3"),
+    SRAid = c("SRR5952429", "SRR5952430", "SRR5952431", "SRR5952432", "SRR5952433", "SRR5952434"),
+    OD = c(0.0025, 0.0025, 0.0025, 4.1762, 3.984, 3.9015),
+    Replicate = c("R1", "R2", "R3", "R1", "R2", "R3"),
+    Condition = c("IN", "IN", "IN", "OUT", "OUT", "OUT")
+))
+```
+
+# Load required packages
+
+```{r load-pkg}
+suppressPackageStartupMessages({
+    library(mutscan)
+    library(SummarizedExperiment)
+    library(scales)
+    library(ggplot2)
+    library(cowplot)
+    library(GGally)
+})
+```
+
+# Process FASTQ files separately
+
+The first step in the analysis workflow is to process the FASTQ files for the different samples separately, using the `digestFastqs()` function from the `mutscan` package. 
+In this case, the forward read contains a UMI, a constant sequence, and the sequence of the FOS variant.
+Similarly, the reverse read contains a UMI, a constant sequence, and the sequence of the JUN variant. 
+As the two reads in a pair represent different protein variants, they don't share any sequence and thus should not be merged for the purposes of the analysis. 
+By setting `mergeForwardReverse = FALSE`, we extract sequence components separately for the forward and reverse reads, and compare them to their respective wild type sequence. 
+The final mutant name will be a combination of the identified FOS and JUN mutations for the read pair.
+
+```{r run-digestfastqs, echo = TRUE, eval = FALSE}
+res <- lapply(structure(samples$Name, names = samples$Name), function(s) {
+    digestFastqs(fastqForward = file.path(fastqdir, paste0(samples$SRAid[samples$Name == s],
+                                                           "_1.fastq.gz")),
+                 fastqReverse = file.path(fastqdir, paste0(samples$SRAid[samples$Name == s],
+                                                           "_2.fastq.gz")),
+                 mergeForwardReverse = FALSE, 
+                 adapterForward = "GGAAGAGCACACGTC",
+                 adapterReverse = "GGAAGAGCGTCGTGT",
+                 elementsForward = "SUCV",
+                 elementLengthsForward = c(1, 10, 18, 96),
+                 elementsReverse = "SUCV",
+                 elementLengthsReverse = c(1, 8, 20, 96),
+                 wildTypeForward = c(FOS = "ACTGATACACTCCAAGCGGAGACAGACCAACTAGAAGATGAGAAGTCTGCTTTGCAGACCGAGATTGCCAACCTGCTGAAGGAGAAGGAAAAACTA"),
+                 wildTypeReverse = c(JUN = "ATCGCCCGGCTGGAGGAAAAAGTGAAAACCTTGAAAGCTCAGAACTCGGAGCTGGCGTCCACGGCCAACATGCTCAGGGAACAGGTGGCACAGCTT"),
+                 constantForward = "AACCGGAGGAGGGAGCTG",
+                 constantReverse = "GAAAAAGGAAGCTGGAGAGA",
+                 nbrMutatedCodonsMaxForward = 1,
+                 nbrMutatedCodonsMaxReverse = 1, 
+                 forbiddenMutatedCodonsForward = "NNW",
+                 forbiddenMutatedCodonsReverse = "NNW",
+                 verbose = FALSE, 
+                 nThreads = 10, 
+                 maxNReads = -1)
+})
+```
+
+```{r save-data, echo = FALSE, eval = FALSE}
+saveRDS(res, file = "diss_fosjun_digestfastqs.rds")
+```
+
+```{r read-data, echo = FALSE, eval = TRUE}
+res <- readRDS("diss_fosjun_digestfastqs.rds")
+```
+
+The output of `digestFastqs()` is a list for each sample, containing the read and UMI counts for each variant, as well as a filtering summary.
+For each variant, we also get the number of mutated bases, codons and amino acids, the type of mutations, and the nucleotide as well as amino acid sequence.
+As we can see, the name assigned to each mutant combination consists of the name of the wildtype sequence(s), the codon position with a mutation (0 if no mutation is present), and the mutated codon sequence.
+If we would like to focus on nucleotides rather than codons, that can be achieved by limiting the number of mutated bases rather than codons in the call to `digestFastqs()`. 
+In that case, the mutant name would consist of the wildtype sequence name, the position of the mutated nucleotide(s), and the observed nucleotide at that position.
+
+```{r output-example}
+## Our list has one entry per sample
+names(res)
+## List entries for a specific sample
+names(res$TRANSIN1)
+## Count table
+head(res$TRANSIN1$summaryTable)
+## Filter summary
+res$TRANSIN1$filterSummary
+## Parameters used for the processing, including mutscan version and analysis date
+res$TRANSIN1$parameters$processingInfo
+```
+
+Since we provided a constant sequence for our experiment, `mutscan` additionally outputs a table that lets us estimate the sequencing error rate. 
+
+```{r seq-errors}
+(propErrorsConstantF <- sum(res$TRANSIN1$errorStatistics$nbrMismatchForward) /
+   (nchar(res$TRANSIN1$parameters$constantForward) * res$TRANSIN1$filterSummary$nbrRetained))
+(propErrorsConstantR <- sum(res$TRANSIN1$errorStatistics$nbrMismatchReverse) /
+   (nchar(res$TRANSIN1$parameters$constantReverse) * res$TRANSIN1$filterSummary$nbrRetained))
+```
+
+# Summarizing output from all samples
+
+While the `digestFastqs()` output for each sample can be explored directly, for convenience we merge the data from all samples into a single [SummarizedExperiment](https://bioconductor.org/packages/SummarizedExperiment/) object. 
+This object contains all information from the `digestFastqs()` output above, as well as the information from the sample metadata table. 
+
+```{r summarize}
+samples
+se <- summarizeExperiment(res, 
+                          coldata = samples,
+                          countType = "umis")
+se
+## Variant information
+rowData(se)
+## Sample information
+colData(se)
+```
+
+# Diagnostic plots
+
+At this point, we can look at some diagnostic plots. 
+First, we display the number of identified variants with a given number of base mutations. 
+
+```{r count-nbrmut}
+(g1 <- ggplot(as.data.frame(rowData(se)), aes(x = minNbrMutBases)) + 
+     geom_bar() + theme_bw() + 
+     scale_y_log10() + 
+     labs(x = "Number of mutated bases (FOS + JUN)",
+          y = "Number of variants") + 
+     theme(axis.text = element_text(size = 15),
+           axis.title = element_text(size = 15)))
+```
+
+We can also visualize the average number of counts (across all samples) for variants with different numbers of mutations.
+
+```{r abundance-nbrmut}
+df <- data.frame(nbrmut = factor(rowData(se)$minNbrMutBases),
+                 avelogcount = rowMeans(log10(assay(se, "counts") + 1)))
+(g2 <- ggplot(df, aes(x = nbrmut, y = avelogcount)) + 
+        geom_violin() + 
+        stat_summary(fun = "median",
+                     geom = "crossbar", 
+                     width = 0.25,
+                     color = "red") + 
+        geom_point(data = df %>% dplyr::filter(nbrmut == 0), size = 3, color = "black") + 
+        theme_bw() + 
+        labs(x = "Number of mutated bases (FOS + JUN)", y = "Mean (log10(count + 1))") + 
+        theme(axis.text = element_text(size = 15),
+              axis.title = element_text(size = 15)))
+```
+
+From the plots above, we conclude that there are many more different variants with a large number of base mutations, but each of them is considerably less abundant than variants with fewer mutations. 
+
+Next, we display the number of reads that remain after each of the filtering criteria in `digestFastqs()`, for each of the samples, as well as the fraction of reads filtered out by each of the criteria. 
+
+```{r filter-remain, fig.height = 8}
+(g3 <- plotFiltering(se, valueType = "reads", onlyActiveFilters = TRUE, 
+                     plotType = "remaining", facetBy = "sample", numberSize = 3))
+```
+
+```{r filter-fractions, fig.height = 8}
+(g4 <- plotFiltering(se, valueType = "fractions", onlyActiveFilters = TRUE,
+                     plotType = "filtered", facetBy = "step", numberSize = 3))
+```
+
+# Concordance among the samples
+
+In addition to sample-specific diagnostic plots like the ones shown above, we can also look at the concordance among the samples, in terms of the correlation between their count vectors. 
+
+```{r pairs-plot}
+(g5 <- plotPairs(se, selAssay = "counts", addIdentityLine = TRUE))
+```
+
+# Collapsing data by amino acid
+
+In the objects that we have been working with so far, each row corresponds to a distinct variant (codon mutation). 
+In some cases, we would like to collapse variants with the same amino acid sequence. 
+This can be done using the `collapseMutantsByAA()` function, which returns another SummarizedExperiment, where each row represents a specific amino acid sequence.
+
+```{r collapse-se}
+se <- collapseMutantsByAA(se)
+```
+
+We can see that this object is smaller than the previous one (fewer rows), as expected. 
+In addition, each row now corresponds to potentially several different nucleotide sequences and number of mutated bases.
+For example, the "wild type" amino acid sequence is represented by individual sequences with up to six silent mutations. 
+
+```{r display-collapsed}
+se
+rowData(se)
+```
+
+# Calculating fitness scores
+
+`mutscan` provides multiple options for calculating fitness scores. 
+For growth rate-based assays, the fitness score as defined by @Diss2018 can be calculated for each sample using the `calculateFitnessScore()` function. 
+
+```{r ppi-scores}
+ppis <- calculateFitnessScore(se = se, pairingCol = "Replicate", 
+                              ODCols = c("OD"),
+                              comparison = c("Condition", "OUT", "IN"),
+                              WTrows = "FOS.0.WT_JUN.0.WT")
+head(ppis[order(abs(rowMeans(ppis)), decreasing = TRUE), , drop = FALSE])
+
+## The wildtype sequence has a fitness score of 1, by construction
+ppis["FOS.0.WT_JUN.0.WT", , drop = FALSE]
+```
+
+In addition, and more generally, a fitness score can be calculated as the log-fold change of output vs input samples (paired by the Replicate column), either in absolute terms or relative to the wildtype sequence (by specifying the `WTrows` argument to the `calculateRelativeFC()` function).
+`mutscan` allows using either edgeR or limma-voom for calculation of log-fold changes.
+
+```{r edger-scores, warning = FALSE}
+edger_scores <- calculateRelativeFC(
+    se = se,
+    design = model.matrix(~ Replicate + Condition,
+                          data = colData(se)),
+    coef = "ConditionOUT", pseudocount = 1,
+    WTrows = "FOS.0.WT_JUN.0.WT",
+    method = "edgeR")
+head(edger_scores[order(edger_scores$PValue), , drop = FALSE])
+
+## The wildtype sequence has a log-fold change close to 0, by construction
+edger_scores["FOS.0.WT_JUN.0.WT", , drop = FALSE]
+```
+
+# Reproducing some figures from @Diss2018
+
+In this section, we use the results generated above to reproduce some of the figures from @Diss2018.
+First, we filter the variants and keep only those with at least 11 counts in all input samples, and at least 1 count in all output samples.
+We also remove all variants with a premature stop codon.
+
+```{r filter-paper}
+keepVariants <- 
+    rownames(se)[
+        DelayedArray::rowMins(as.matrix(assay(se[, se$Condition == "IN"],
+                                              "counts"))) > 10 & 
+            DelayedArray::rowMins(as.matrix(assay(se[, se$Condition == "OUT"],
+                                                  "counts"))) > 0]
+keepVariants <- setdiff(keepVariants, grep("*", keepVariants, fixed = TRUE, value = TRUE))
+length(keepVariants)
+```
+
+We also summarize the PPI scores and log-fold changes in a table, for convenience.
+
+```{r ppi-table}
+df0 <- data.frame(mutation = rownames(ppis), 
+                  PPI1 = ppis[, "OUT_vs_IN_replR1"],
+                  PPI2 = ppis[, "OUT_vs_IN_replR2"],
+                  PPI3 = ppis[, "OUT_vs_IN_replR3"],
+                  avePPI = rowMeans(ppis, na.rm = TRUE),
+                  stringsAsFactors = FALSE) %>%
+    dplyr::full_join(as.data.frame(edger_scores) %>% 
+                         tibble::rownames_to_column("mutation") %>%
+                         dplyr::select(mutation, logFC_shrunk, logCPM, FDR),
+                     by = "mutation") %>%
+    dplyr::mutate(keepVariants = mutation %in% keepVariants)
+head(df0)
+```
+
+
+## Distribution of PPI scores for the individual replicates
+
+The figure below shows the distribution of PPI scores across the variants retained in the paper, for each of the three replicates.
+
+
+```{r ppi-distributions}
+(g6 <- ggplot(df0 %>% dplyr::filter(keepVariants) %>%
+                  dplyr::select(mutation, PPI1, PPI2, PPI3) %>%
+                  tidyr::gather(key = Replicate, value = PPI, -mutation),
+              aes(x = PPI, color = Replicate)) + 
+     geom_line(stat = "density", size = 1) + theme_bw() +
+     labs(x = "PPI score") + 
+     theme(axis.text = element_text(size = 15),
+           axis.title = element_text(size = 15)))
+```
+
+## Correlation between PPI scores for two replicates
+
+Next, we plot the agreement of the PPI scores between the first two replicates, distinguishing between variants with a mutation in only one of the proteins, and variants with mutations in both.
+
+```{r ppi-correlations}
+df <- df0 %>% 
+    dplyr::filter(mutation != "FOS.0.WT_JUN.0.WT") %>%
+    dplyr::mutate(mutationType = 
+                      c("double", "single")[grepl(".0.", mutation, fixed = TRUE) + 1]) %>%
+    dplyr::mutate(mutFos = c("", "Fos")[as.numeric(!grepl("FOS.0.", mutation, 
+                                                          fixed = TRUE)) + 1],
+                  mutJun = c("", "Jun")[as.numeric(!grepl("JUN.0.", mutation, 
+                                                          fixed = TRUE)) + 1]) %>%
+    tidyr::unite("mutationTypeFull", mutationType, mutFos, mutJun, 
+                 sep = "", remove = FALSE)
+df %>% dplyr::filter(keepVariants) %>% dplyr::group_by(mutationType) %>%
+    dplyr::summarize(correlation = cor(PPI1, PPI2, use = "pairwise.complete.obs"))
+
+(g7 <- ggplot() + 
+        geom_point(data = df %>% dplyr::filter(keepVariants & mutationType == "double"), 
+                   aes(x = PPI1, y = PPI2, color = mutationType), alpha = 0.01, 
+                   size = 0.5) +
+        geom_point(data = df %>% dplyr::filter(keepVariants & mutationType == "single"), 
+                   aes(x = PPI1, y = PPI2, color = mutationType), alpha = 1,
+                   size = 0.5) + 
+        geom_abline(slope = 1, intercept = 0) + theme_bw() + 
+        scale_color_manual(values = c(double = "blue", single = "orange"), 
+                           name = "") + 
+        labs(x = "PPI score, replicate 1", y = "PPI score, replicate 2") + 
+        theme(axis.text = element_text(size = 15),
+              axis.title = element_text(size = 15)))
+```
+
+## Heatmap of single mutant PPI scores
+
+Finally, we plot a heatmap of the average PPI scores for the single mutant, stratified by the heptad position. 
+
+```{r heatmap-single-mutants, fig.height = 8}
+## Get single mutations only
+ppis_single <- ppis[grep(".0.", rownames(ppis), fixed = TRUE), ]
+ppis_single <- ppis_single[rownames(ppis_single) != "FOS.0.WT_JUN.0.WT", ]
+dim(ppis_single)
+head(ppis_single)
+
+hm <- 
+    data.frame(mutation = rownames(ppis_single), avePPI = rowMeans(ppis_single), 
+               stringsAsFactors = FALSE) %>%
+    dplyr::filter(mutation %in% keepVariants) %>%
+    dplyr::mutate(mutation = gsub("FOS.0.WT_", "", mutation),
+                  mutation = gsub("_JUN.0.WT", "", mutation)) %>%
+    dplyr::mutate(protein = sapply(strsplit(mutation, "\\."), .subset, 1),
+                  position = sapply(strsplit(mutation, "\\."), .subset, 2),
+                  aminoacid = sapply(strsplit(mutation, "\\."), .subset, 3)) %>%
+    dplyr::select(-mutation) %>%
+    dplyr::mutate(position = as.factor(as.numeric(position))) %>%
+    dplyr::filter(aminoacid != "*") %>%
+    dplyr::mutate(aminoacid = factor(
+        aminoacid, levels = rev(c("A", "L", "I", "V", "F", "W", "Y", "H", 
+                                  "S", "T", "Q", "N", "D", "E", "K", "R", 
+                                  "M", "C", "G", "P"))))
+(g8 <- ggplot(hm,
+              aes(x = position, y = aminoacid, fill = avePPI)) + 
+        geom_tile() + facet_wrap(~protein, ncol = 1) + 
+        theme_bw() + 
+        scale_fill_gradientn(colours = c("blue", "white", "darkred"), 
+                             values = rescale(c(0.4, 1, 1.1)),
+                             guide = "colorbar", limits = c(0.4, 1.1), 
+                             na.value = "white", 
+                             name = "Average\nPPI") + 
+        geom_vline(xintercept = c(7.5, 14.5, 21.5, 28.5)) + 
+        ylab("Amino acid") + 
+        theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+              axis.title = element_text(size = 16), 
+              strip.text = element_text(size = 14)))
+```
+
+# Generate summary figure for paper
+
+```{r summary-figure, fig.width = 17, fig.height = 17}
+a1 <- cowplot::plot_grid(g1, g2, ncol = 1, align = "v", axis = "lr", 
+                         rel_heights = c(1, 1), labels = c("A", "B"))
+a2 <- cowplot::plot_grid(g3 + theme(axis.text.x = element_text(size = 8), 
+                                    axis.text.y = element_text(size = 8)),
+                         g4 + theme(axis.text.x = element_text(size = 8), 
+                                    axis.text.y = element_text(size = 8)),
+                         nrow = 1, align = "h", axis = "b", rel_widths = c(1, 1), 
+                         labels = c("C", "D"))
+a3 <- cowplot::plot_grid(a1, a2, rel_widths = c(0.5, 1))
+a4 <- cowplot::plot_grid(ggmatrix_gtable(g5), g8, nrow = 1, align = "h", 
+                         axis = "b", rel_widths = c(1, 1), labels = c("E", "F"))
+cowplot::plot_grid(a3, a4, ncol = 1)
+```
+
+
+# Session info
+
+```{r session-info}
+sessionInfo()
+```
+
+# References
+
